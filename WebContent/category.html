@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="css/bootstrap.3.3.7.css" rel="stylesheet">
+    <link href="css/bootstrap-theme.css" rel="stylesheet">
+    <link href="css/bootstrap-table.css" rel="stylesheet">
+    <script type="text/javascript" src="js/jquery-1.11.1.js"></script>
+    <script type="text/javascript" src="js/bootstrap3.3.7.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap-table.js"></script>
+    <script type="text/javascript" src="js/bootstrap-table-zh-CN.js"></script>
+    <script type="text/javascript">
+        $(function () {
+        	//设置查询按钮的单击事件
+        	$("#searchbtn").click(function() {
+                $("#bootstrap-table").bootstrapTable("refresh")//点击查询按钮，刷新Table，也就是想服务器后台发出请求url:'employeeservlet?action=page',
+            });
+        	//设置显示数据的表格
+            var $table = $("#bootstrap-table");
+            $table.bootstrapTable({
+                url:'categoryservlet?action=page',  //设置向服务器发出的请求
+                contentType : "application/x-www-form-urlencoded",
+                method : 'POST', //请求方式（*）
+                dataType:'json', //数据是json格式
+                pagination:true,//分页
+                paginationPreText:'上一页',
+                paginationNextText:'下一页',
+                striped:true,//条纹
+                height:380,  //设置表格高度
+                sidePagination:'server',//server:服务器端分页|client：前端分页
+            	pageSize:5,//单页记录数
+            	pageList:[ 5, 10, 20, 30 ],//可选择单页记录数
+                toolbar:"#toolbar",
+                responseHandler:responseHandler,//接受后台传过来的值进行绑定处理的函数
+                queryParamsType:"undefined",
+                queryParams:queryParams,//一系列操作后向后台发送参数的函数
+                columns:[
+                    {
+                        title:"分类编码",
+                        field:"code",
+                        align:'center',
+                        valign:"middle"
+                    },{
+                        title:"分类名称",
+                        field:"nameCn",
+                        align:'center',
+                        valign:"middle"
+                    },{
+                        title:"上级分类",
+                        field:"parentCn",
+                        align:'center',
+                        valign:"middle"
+                    },{
+                    	title:"备注",
+                        field:"comment",
+                        align:'center',
+                        valign:"middle"
+                    }
+                ]
+            });
+        });
+        //返回数据的处理
+        function responseHandler(res){
+            return{
+                'total' : res.total,
+                "rows" : res.data,
+                "offset" : res.offset,
+                "limit" : res.limit
+            }
+        }
+        //向服务器发送的请求参数
+        function queryParams(params){
+            //一系列操作后向后台传递的参数，这里可以传搜索框的值
+            var searchName = $("#cat_nameCn").val();
+            var parentstr = $("#car_parentCn").val();
+            return{
+                "pageNumber" : params.pageNumber,//当前页数
+                "pageSize" : params.pageSize,    //每页所显示的记录数
+                "nameCn" : searchName,            //要检索的姓名
+                "parentCn":parentstr                   //要检索的所在部门
+            }
+        }
+
+    </script>
+</head>
+<body>
+  <div id="wrapper">
+       <div class="row">
+            <div class="col-lg-1"></div>
+			<div class="col-lg-10">
+			   <form id="condition-form" class="form-inline"  >
+			<div class="form-group">
+				<label for="cat_nameCn">姓名:</label> 
+				<input type="text" class="form-control" id="cat_nameCn"  name="nameCn" />
+			</div>
+	        <div class="form-group">
+				<label for="emp_dept">所在部门:</label> 
+				  <select	class="form-control" id="car_parentCn" name="parentCn">
+					  <option value="">--请选择--</option>
+					  <option value="普通资产">普通资产</option>
+					  <option value="车辆">车辆</option>
+					  <option value="不动产">不动产</option>
+					  <option value="金融资产">金融资产</option>
+					  <option value="办公设备">办公设备</option>
+					  <option value="家具">家具</option>
+					  <option value="办公耗材">办公耗材</option>
+					  <option value="测量仪器">测量仪器</option>
+					  <option value="电脑">电脑</option>
+					  <option value="卫生洁具">卫生洁具</option>
+					  <option value="普通车辆">普通车辆</option>
+					  <option value="工程车辆">工程车辆</option>
+					  <option value="通勤班车">通勤班车</option>
+					  <option value="住宅">住宅</option>
+					  <option value="办公">办公</option>
+					  <option value="仓储">仓储</option>
+					  <option value="银行">银行</option>
+					  <option value="金融投资">金融投资</option>
+					  <option value="借贷">借贷</option>
+				  </select>
+			</div>
+					<input type="hidden" name="action" value="list">
+					<button type="button" class="btn btn-primary" id="searchbtn">查询</button>
+				</form>
+			</div>
+        </div>
+		
+		
+		<div class="row">
+            <div class="col-lg-1"></div>
+			<div class="col-lg-10">
+			  <table id="bootstrap-table"></table>
+			</div>
+        </div>
+     
+ </div>  
+</body>
+</html>

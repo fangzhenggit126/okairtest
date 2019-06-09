@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="css/bootstrap.3.3.7.css" rel="stylesheet">
+    <link href="css/bootstrap-theme.css" rel="stylesheet">
+    <link href="css/bootstrap-table.css" rel="stylesheet">
+    <script type="text/javascript" src="js/jquery-1.11.1.js"></script>
+    <script type="text/javascript" src="js/bootstrap3.3.7.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap-table.js"></script>
+    <script type="text/javascript" src="js/bootstrap-table-zh-CN.js"></script>
+    <script type="text/javascript">
+        $(function () {
+        	//设置查询按钮的单击事件
+        	$("#searchbtn").click(function() {
+                $("#bootstrap-table").bootstrapTable("refresh")//点击查询按钮，刷新Table，也就是想服务器后台发出请求url:'employeeservlet?action=page',
+            });
+        	//设置显示数据的表格
+            var $table = $("#bootstrap-table");
+            $table.bootstrapTable({
+                url:'employeeservlet?action=page',  //设置向服务器发出的请求
+                contentType : "application/x-www-form-urlencoded",
+                method : 'POST', //请求方式（*）
+                dataType:'json', //数据是json格式
+                pagination:true,//分页
+                paginationPreText:'上一页',
+                paginationNextText:'下一页',
+                striped:true,//条纹
+                height:380,  //设置表格高度
+                sidePagination:'server',//server:服务器端分页|client：前端分页
+            	pageSize:5,//单页记录数
+            	pageList:[ 5, 10, 20, 30 ],//可选择单页记录数
+                toolbar:"#toolbar",
+                responseHandler:responseHandler,//接受后台传过来的值进行绑定处理的函数
+                queryParamsType:"undefined",
+                queryParams:queryParams,//一系列操作后向后台发送参数的函数
+                columns:[
+                    {
+                        title:"员工编码",
+                        field:"empNo",
+                        align:'center',
+                        valign:"middle"
+                    },{
+                        title:"姓名",
+                        field:"namecn",
+                        align:'center',
+                        valign:"middle"
+                    },{
+                        title:"所在部门",
+                        field:"dept",
+                        align:'center',
+                        valign:"middle"
+                    },{
+                    	title:"上级",
+                        field:"report_To",
+                        align:'center',
+                        valign:"middle"
+                    }
+                ]
+            });
+        });
+        //返回数据的处理
+        function responseHandler(res){
+            return{
+                'total' : res.total,
+                "rows" : res.data,
+                "offset" : res.offset,
+                "limit" : res.limit
+            }
+        }
+        //向服务器发送的请求参数
+        function queryParams(params){
+            //一系列操作后向后台传递的参数，这里可以传搜索框的值
+            var searchName = $("#emp_nameCn").val();
+            var deptstr = $("#emp_dept").val();
+            return{
+                "pageNumber" : params.pageNumber,//当前页数
+                "pageSize" : params.pageSize,    //每页所显示的记录数
+                "nameCn" : searchName,            //要检索的姓名
+                "dept":deptstr                   //要检索的所在部门
+            }
+        }
+
+    </script>
+</head>
+<body>
+  <div id="wrapper">
+       <div class="row">
+            <div class="col-lg-1"></div>
+			<div class="col-lg-10">
+			   <form id="condition-form" class="form-inline"  >
+			<div class="form-group">
+				<label for="emp_nameCn">姓名:</label> 
+				<input type="text" class="form-control" id="emp_nameCn"  name="nameCn" />
+			</div>
+	        <div class="form-group">
+				<label for="emp_dept">所在部门:</label> 
+				  <select	class="form-control" id="emp_dept" name="dept">
+					  <option value="">--请选择--</option>
+					  <option value="北京人力资源部">北京人力资源部</option>
+					  <option value="北京开发部">北京开发部</option>
+					  <option value="北京财务部">北京财务部</option>
+					  <option value="天津开发部">天津开发部</option>
+					  <option value="北京行政事业部">北京行政事业部</option>
+					  <option value="天津财务部">天津财务部</option>
+					  <option value="天津行政事业部">天津行政事业部</option>
+				  </select>
+			</div>
+					<input type="hidden" name="action" value="list">
+					<button type="button" class="btn btn-primary" id="searchbtn">查询</button>
+				</form>
+			</div>
+        </div>
+		
+		
+		<div class="row">
+            <div class="col-lg-1"></div>
+			<div class="col-lg-10">
+			  <table id="bootstrap-table"></table>
+			</div>
+        </div>
+     
+ </div>  
+</body>
+</html>
